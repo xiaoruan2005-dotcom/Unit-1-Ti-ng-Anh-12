@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 1: Life Stories We Admire - Interactive Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header Section -->
+  <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-graduation-cap text-3xl text-yellow-300"></i>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide">ENGLISH 12 - UNIT 1</h1>
+          <p class="text-xs text-indigo-200 uppercase tracking-wider font-semibold">Life Stories We Admire</p>
+        </div>
+      </div>
+      <div id="timerContainer" class="hidden bg-indigo-800/80 backdrop-blur border border-indigo-500/50 px-4 py-1.5 rounded-full flex items-center space-x-2 text-yellow-300">
+        <i class="fa-regular fa-clock"></i>
+        <span id="timerDisplay" class="font-mono font-bold text-lg">00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto w-full px-4 py-8 flex-grow">
+
+    <!-- Step 1: Student Information Form -->
+    <div id="studentInfoCard" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 md:p-8">
+      <div class="text-center mb-6">
+        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Thông Tin Học Sinh</span>
+        <h2 class="text-2xl font-bold text-slate-900 mt-2">Bài Kiểm Tra Tương Tác Unit 1</h2>
+        <p class="text-slate-500 text-sm mt-1">Vui lòng điền đầy đủ thông tin để bắt đầu làm bài. Kết quả và giải thích chi tiết sẽ hiển thị sau khi nộp bài.</p>
+      </div>
+
+      <form id="startForm" onsubmit="startQuiz(event)" class="space-y-4 max-w-md mx-auto">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1" for="studentName">Họ và Tên <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <input type="text" id="studentName" required placeholder="Nguyễn Văn A" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-slate-800 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1" for="studentEmail">Địa chỉ Email <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+              <i class="fa-regular fa-envelope"></i>
+            </span>
+            <input type="email" id="studentEmail" required placeholder="hocsinh@school.edu.vn" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-slate-800 transition">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2 mt-6">
+          <span>Bắt Đầu Làm Bài</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: Quiz Application Section -->
+    <div id="quizApp" class="hidden space-y-6">
+
+      <!-- Progress Bar -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky top-20 z-40">
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-500 mb-2">
+          <span>Tiến độ: <strong id="answeredCount" class="text-indigo-600">0</strong>/<span id="totalCount">0</span> câu</span>
+          <span id="percentComplete">0%</span>
+        </div>
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+          <div id="progressBar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- Quiz Questions Container -->
+      <form id="quizForm" onsubmit="submitQuiz(event)" class="space-y-6">
+        <div id="questionsContainer" class="space-y-6"></div>
+
+        <div class="pt-4 text-center">
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg transition transform active:scale-95 inline-flex items-center space-x-2 text-lg">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Nộp Bài Kiểm Tra</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Quiz Result Dashboard -->
+    <div id="resultCard" class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-6 md:p-8 space-y-6">
+      <div class="text-center border-b pb-6 border-slate-100">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+          <i class="fa-solid fa-trophy text-2xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-900">Kết Quả Bài Làm</h2>
+        <p class="text-slate-500 text-sm mt-1">Chi tiết điểm số và đáp án kèm giải thích</p>
+      </div>
+
+      <!-- Student Badge & Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+          <div class="text-xs uppercase font-bold text-slate-400">Học sinh</div>
+          <div id="resStudentName" class="font-bold text-slate-800 text-lg mt-1">-</div>
+          <div id="resStudentEmail" class="text-xs text-slate-500">-</div>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+          <div class="text-xs uppercase font-bold text-slate-400">Điểm số</div>
+          <div id="resScore" class="font-extrabold text-indigo-600 text-3xl mt-1">0 / 0</div>
+          <div id="resAccuracy" class="text-xs font-semibold text-slate-500 mt-1">0% chính xác</div>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+          <div class="text-xs uppercase font-bold text-slate-400">Thời gian làm bài</div>
+          <div id="resTime" class="font-bold text-slate-800 text-lg mt-1">00:00</div>
+          <div class="text-xs text-green-600 mt-1"><i class="fa-solid fa-check-circle"></i> Đã nộp thành công</div>
+        </div>
+      </div>
+
+      <!-- Detailed Review Section -->
+      <div class="pt-4">
+        <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center space-x-2">
+          <i class="fa-solid fa-list-check text-indigo-600"></i>
+          <span>Đáp Án & Giải Thích Chi Tiết</span>
+        </h3>
+        <div id="reviewContainer" class="space-y-6"></div>
+      </div>
+
+      <div class="text-center pt-4">
+        <button onclick="window.location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition inline-flex items-center space-x-2">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Làm Lại Bài Kiểm Tra</span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script & Data -->
+  <script>
+    const questionsData = [
+      // PART A: PRACTICE
+      {
+        id: "Q1",
+        section: "PART A: PRACTICE - Question 1",
+        context: "a. Jack: Her perseverance and passion for discovery truly inspire me.<br>b. Nick: Yes! Her groundbreaking work in science, despite facing so many challenges, is incredible.<br>c. Jack: Have you ever heard about the life story of Marie Curie?",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "a-c-b", B: "b-a-c", C: "c-b-a", D: "c-a-b" },
+        correct: "C",
+        explanation: "Thứ tự hội thoại hợp lý: (c) Mở đầu cuộc trò chuyện hỏi về Marie Curie -> (b) Đồng tán thành và khen ngợi công trình khoa học của bà -> (a) Kết lại bằng cảm xúc bị truyền cảm hứng bởi sự kiên trì và đam mê."
+      },
+      {
+        id: "Q2",
+        section: "PART A: PRACTICE - Question 2",
+        context: "a. Michael: Despite facing discrimination and personal struggles, she used her voice to speak out for others.<br>b. Emma: That's right, her words continue to inspire generations, reminding us of the power of resilience and courage.<br>c. Emma: Maya Angelou's life is truly inspiring, especially her journey from hardship to greatness.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "a-c-b", B: "b-a-c", C: "c-b-a", D: "c-a-b" },
+        correct: "C",
+        explanation: "Thứ tự hội thoại: (c) Giới thiệu về Maya Angelou -> (a) Michael bổ sung về sự vượt khó và lên tiếng vì người khác -> (b) Emma đồng ý ('That's right') và tổng kết lại ý nghĩa các tác phẩm của bà."
+      },
+      {
+        id: "Q3",
+        section: "PART A: PRACTICE - Question 3",
+        context: "a. Bob: That's true, he wasn't just a founder, he was a visionary.<br>b. Alice: I really admire the story of Steve Jobs, he changed the entire tech industry.<br>c. Alice: His persistence in developing Apple is truly impressive.<br>d. Bob: Jobs taught us that failure is part of success, the key is to never give up.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "b-c-a-d", B: "b-a-c-d", C: "a-c-d-b", D: "c-a-b-d" },
+        correct: "A",
+        explanation: "Thứ tự hợp lý: Alice mở đầu ngưỡng mộ Steve Jobs (b), nêu rõ sự kiên trì của ông khi phát triển Apple (c), Bob tán đồng ông là tầm nhìn xa (a) và rút ra bài học về thất bại (d)."
+      },
+      {
+        id: "Q4",
+        section: "PART A: PRACTICE - Question 4",
+        context: "a. Sarah: That’s right, and she won it twice. Her dedication to science despite all the challenges is amazing.<br>b. Sarah: Have you heard about Marie Curie’s life story?<br>c. David: Absolutely. She broke so many barriers and left an unforgettable legacy.<br>d. David: Yes, I have. She was the first woman to win a Nobel Prize, right?",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "b-c-a-d", B: "b-d-a-c", C: "a-c-b-d", D: "c-a-b-d" },
+        correct: "B",
+        explanation: "Thứ tự hội thoại: Sarah hỏi (b) -> David trả lời 'Yes, I have' kèm thông tin giải Nobel (d) -> Sarah xác nhận 'That's right' và bổ sung thông tin đoạt giải 2 lần (a) -> David chốt lại di sản của bà (c)."
+      },
+      {
+        id: "Q5",
+        section: "PART A: PRACTICE - Question 5",
+        context: "a. Hannah: I think it was her courage and determination to stand up for what’s right, even in the face of adversity.<br>b. Hannah: Do you know about Rosa Parks and what she did?<br>c. Luke: Yes, she refused to give up her seat on a bus, sparking the civil rights movement. What do you think made her act so brave?<br>d. Luke: Exactly, her quiet yet powerful act of resistance changed history.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "b-c-a-d", B: "b-d-a-c", C: "b-c-d-a", D: "c-a-b-d" },
+        correct: "A",
+        explanation: "Thứ tự: Hannah hỏi về Rosa Parks (b) -> Luke trả lời và hỏi lại nguyên nhân hành động dũng cảm (c) -> Hannah đưa ra suy nghĩ (a) -> Luke đồng ý 'Exactly' và kết luận (d)."
+      },
+      {
+        id: "Q6",
+        section: "PART A: PRACTICE - Question 6",
+        context: "a. Bob: Yes, his perseverance was key. He believed in his vision no matter the obstacles.<br>b. Alice: I really admire Steve Jobs. Do you think his legacy still influences the tech world today?<br>c. Bob: Absolutely! His ideas revolutionized everything, from personal computers to smartphones.<br>d. Alice: That’s true. What’s most impressive to me is how he turned failures into successes.<br>e. Alice: It’s inspiring to see someone so passionate about their work and willing to take risks.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "b-c-e-a-d", B: "b-d-e-a-c", C: "b-c-e-d-a", D: "c-e-a-b-d" },
+        correct: "C",
+        explanation: "Mở đầu b (Alice hỏi về ảnh hưởng) -> c (Bob trả lời Absolutely) -> e (Alice nhận xét sự truyền cảm hứng) -> d (Alice nhấn mạnh việc biến thất bại thành thành công) -> a (Bob kết lại bằng ý chí kiên trì của Jobs)."
+      },
+      {
+        id: "Q7",
+        section: "PART A: PRACTICE - Question 7",
+        context: "a. Minh: What was special about his leadership?<br>b. Mai: He was always close to the people, listening to and understanding their desires.<br>c. Minh: President Ho Chi Minh made great contributions to the Vietnamese revolution, do you agree?<br>d. Minh: His deep connection with the people was the key factor that led to the success of the revolution.<br>e. Mai: Absolutely, he was the founder of the Communist Party of Vietnam and led the resistance against the French.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "c-b-e-a-d", B: "d-b-e-a-c", C: "d-c-e-b-a", D: "c-e-a-b-d" },
+        correct: "D",
+        explanation: "Minh hỏi về đóng góp của Bác (c) -> Mai đồng ý 'Absolutely' và nêu thành tựu (e) -> Minh hỏi sâu về phong cách lãnh đạo (a) -> Mai trả lời về sự gần gũi nhân dân (b) -> Minh kết luận ý nghĩa của sự gắn bó đó (d)."
+      },
+      {
+        id: "Q8",
+        section: "PART A: PRACTICE - Question 8",
+        context: "Dear Mom and Dad,<br>I hope this letter finds you both well.<br>a. I’ve also started reading about biological research and cutting-edge treatments...<br>b. The more I learn, the more I realize how much medicine and innovation have advanced.<br>c. Last weekend, I visited a field hospital and met a surgeon...<br>d. I’m excited to continue my journey and hope to use this knowledge in the future.<br>Sending my love and hoping to see you both soon!<br>Warm regards, Emma",
+        question: "Choose the correct order for the body of the letter:",
+        options: { A: "c-a-b-d", B: "d-b-a-c", C: "d-c-b-a", D: "c-b-a-d" },
+        correct: "D",
+        explanation: "Thứ tự thư hợp lý theo tiến trình trải nghiệm: c (kể về chuyến đi bệnh viện dã chiến) -> b (rút ra nhận thức về sự phát triển y học) -> a (bổ sung việc đọc thêm nghiên cứu) -> d (kết thư bằng định hướng tương lai)."
+      },
+      {
+        id: "Q9",
+        section: "PART A: PRACTICE - Question 9",
+        context: "Dear Sarah,<br>a. It was truly inspiring to hear how innovation and determination drive the creative process...<br>b. In addition, I’ve started working on a poetic project...<br>c. Last week, I had the chance to attend a presentation about the film industry...<br>d. I’m excited to see where this journey leads...<br>e. I hope this letter finds you well and happy, and that everything is going smoothly for you.<br>Take care and best wishes, Emma",
+        question: "Choose the correct order for paragraphs/sentences:",
+        options: { A: "e-a-c-b-d", B: "e-c-a-b-d", C: "a-c-e-d-b", D: "d-e-a-c-b" },
+        correct: "B",
+        explanation: "Thứ tự thư: e (lời hỏi thăm đầu thư) -> c (kể về buổi thuyết trình điện ảnh) -> a (bày tỏ cảm tưởng về buổi thuyết trình đó) -> b (In addition - kể thêm dự án làm thơ) -> d (kết thư hướng tới tương lai)."
+      },
+      {
+        id: "Q10",
+        section: "PART A: PRACTICE - Question 10",
+        context: "a. She was intelligent, ambitious, and dedicated...<br>b. During her reign, there were great developments...<br>c. She expanded the Russian Empire...<br>d. She also improved education for children and women...<br>e. Catherine II was a minor German princess who became known as Catherine the Great...",
+        question: "Choose the correct order:",
+        options: { A: "e – d – a – b – c", B: "d – b – a – c – e", C: "e – a – c – d – b", D: "b – c – e – a – d" },
+        correct: "C",
+        explanation: "Mở đầu e (Giới thiệu Catherine II) -> a (Mô tả tính cách và tâm huyết) -> c (Thành tựu mở rộng lãnh thổ) -> d (She also - thành tựu giáo dục) -> b (Tổng kết sự phát triển trong thời kỳ trị vì)."
+      },
+      {
+        id: "Q11",
+        section: "PART A: PRACTICE - Question 11",
+        context: "a. In 1976, Jobs and Steve Wozniak founded Apple...<br>b. This vision led to the creation of iconic products...<br>c. His return to Apple in 1997 marked the beginning of a new era...<br>d. Steve Jobs, the co-founder of Apple Ind., revolutionized the tech industry...<br>e. Therefore, Jobs’ legacy continues to inspire entrepreneurs...",
+        question: "Choose the correct order:",
+        options: { A: "e – d – a – b – c", B: "d – a – c – b – e", C: "e – a – c – d – b", D: "b – c – e – a – d" },
+        correct: "B",
+        explanation: "Thứ tự tiểu sử Steve Jobs: d (Câu chủ đề giới thiệu Steve Jobs) -> a (Năm 1976 thành lập Apple) -> c (Năm 1997 quay trở lại Apple) -> b (Tầm nhìn tạo ra sản phẩm iconic) -> e (Therefore - kết luận về di sản để lại)."
+      },
+      {
+        id: "Q12",
+        section: "PART A: PRACTICE - Question 12",
+        context: "a. Therefore, Ho Chi Minh not only founded the Democratic Republic of Vietnam...<br>b. Ho Chi Minh, born in 1890 in Nghe An, was a great leader of the Vietnamese revolution.<br>c. After founding the Communist Party of Indochina, he led the Vietnamese people to independence...<br>d. His legacy continues to live on in the hearts of the Vietnamese people...<br>e. This revolutionary career began when he traveled abroad to seek ways to free his country...",
+        question: "Choose the correct order:",
+        options: { A: "d – b – a – c – e", B: "e – d – a – b – c", C: "b – c – e – a – d", D: "b – e – c – a – d" },
+        correct: "D",
+        explanation: "Thứ tự chuẩn về Chủ tịch Hồ Chí Minh: b (Giới thiệu năm sinh, quê quán) -> e (Khởi đầu sự nghiệp ra đi tìm đường cứu nước) -> c (Thành lập Đảng và lãnh đạo giành độc lập 1945) -> a (Therefore - khẳng định vị thế) -> d (Di sản sống mãi)."
+      },
+      {
+        id: "Q13",
+        section: "PART A: PRACTICE - Question 13",
+        context: "a. She joined the Viet Minh and became a guerrilla fighter...<br>b. Take care, and I look forward to catching up soon!<br>c. Unfortunately, she was apprehended by the French authorities...<br>d. Her grave, located in Hang Duong Cemetery...<br>e. Dear Ann, I hope this letter finds you well...<br>f. Vo Thi Sau was a remarkable Vietnamese schoolgirl...",
+        question: "Choose the correct order:",
+        options: { A: "e – d – a – b – f – c", B: "d – f – b – a – c – e", C: "e – f – a – c – d – b", D: "b – f – c – e – a – d" },
+        correct: "C",
+        explanation: "Cấu trúc thư: e (Mở đầu thư) -> f (Giới thiệu Võ Thị Sáu) -> a (Tham gia Việt Minh) -> c (Bị thực dân Pháp bắt và hy sinh) -> d (Cảm tưởng khi viếng mộ ở Nghĩa trang Hàng Dương) -> b (Lời chào kết thư)."
+      },
+      {
+        id: "Q14",
+        section: "PART A: PRACTICE - Question 14",
+        context: "a. Despite health challenges, he authored over 30 works...<br>b. Teacher Nguyen Ngoc Ky, who wrote with his feet, inspired generations...<br>c. His determination led him to participate in the national math contest...<br>d. In 2005, he was recognized as 'Vietnam’s first teacher...'<br>e. Born in 1947 in the northern province of Nam Dinh...<br>f. However, he refused to surrender to despair...",
+        question: "Choose the correct order:",
+        options: { A: "d – f – b – a – c – e", B: "e – d – a – b – f – c", C: "b – f – c – e – a – d", D: "b – e – f – c – a – d" },
+        correct: "D",
+        explanation: "Thứ tự diễn biến: b (Giới thiệu chung về Thầy Nguyễn Ngọc Ký) -> e (Năm sinh và biến cố liệt 2 tay lúc 4 tuổi) -> f (Tuy nhiên không đầu hàng số phận, tập viết bằng chân) -> c (Thi học sinh giỏi toán 1963 & học đại học) -> a (Viết hơn 30 tác phẩm) -> d (Vinh danh năm 2005 và di sản)."
+      },
+
+      // PART B: FURTHER PRACTICE - Advertisement
+      {
+        id: "FQ1",
+        section: "PART B: ADVERTISEMENT - Question 1",
+        context: "In life, everyone faces struggles, and at times we may even (1) ___________ out of money.",
+        question: "Choose the best option for (1):",
+        options: { A: "give", B: "run", C: "put", D: "take" },
+        correct: "B",
+        explanation: "Cụm động từ 'run out of money' có nghĩa là hết tiền/cạn kiệt tiền bạc."
+      },
+      {
+        id: "FQ2",
+        section: "PART B: ADVERTISEMENT - Question 2",
+        context: "But what makes a story truly (2) ___________ is how one rises above these challenges.",
+        question: "Choose the best option for (2):",
+        options: { A: "to inspiring", B: "inspire", C: "to inspire", D: "inspiring" },
+        correct: "D",
+        explanation: "Sau cấu trúc 'make something + adj', ở đây cần một tính từ miêu tả bản chất của câu chuyện -> dùng tính từ đuôi -ing: 'inspiring' (truyền cảm hứng)."
+      },
+      {
+        id: "FQ3",
+        section: "PART B: ADVERTISEMENT - Question 3",
+        context: "Life Stories We Admire often involve people who refuse to give (3) ___________, even when they seem to have nothing left.",
+        question: "Choose the best option for (3):",
+        options: { A: "to", B: "up", C: "on", D: "back" },
+        correct: "B",
+        explanation: "Cụm động từ 'give up' có nghĩa là bỏ cuộc/từ bỏ."
+      },
+      {
+        id: "FQ4",
+        section: "PART B: ADVERTISEMENT - Question 4",
+        context: "Our resources, (4) ___________ to help those who have run out of money but refuse to quit, will guide you on your path to success.",
+        question: "Choose the best option for (4):",
+        options: { A: "designing", B: "that designed", C: "designed", D: "was designing" },
+        correct: "C",
+        explanation: "Rút gọn mệnh đề quan hệ dạng bị động: '(which are) designed to help...' -> dùng quá khứ phân từ 'designed'."
+      },
+      {
+        id: "FQ5",
+        section: "PART B: ADVERTISEMENT - Question 5",
+        context: "These resources include (5) ___________ that can help you get back on track.",
+        question: "Choose the best option for (5):",
+        options: { A: "simple financial tools", B: "tools simple financial", C: "simple tools financial", D: "tools financial simple" },
+        correct: "A",
+        explanation: "Trật từ từ trong danh từ ghép: Tính từ 'simple' + Tính từ bổ nghĩa 'financial' + Noun chính 'tools' -> 'simple financial tools'."
+      },
+      {
+        id: "FQ6",
+        section: "PART B: ADVERTISEMENT - Question 6",
+        context: "People we admire for their resilience prove that no matter how tough the journey gets, perseverance and (6) ___________ can always lead to victory.",
+        question: "Choose the best option for (6):",
+        options: { A: "creating", B: "creative", C: "creativity", D: "creatively" },
+        correct: "C",
+        explanation: "Từ nối 'and' nối các từ cùng loại. 'Perseverance' (danh từ) -> vị trí cần điền danh từ 'creativity' (sự sáng tạo)."
+      },
+
+      // PART B: LEAFLET
+      {
+        id: "FQ7",
+        section: "PART B: LEAFLET - Question 7",
+        context: "(7) ___________ adversity, his persistence and resilience allowed him to rise above every challenge.",
+        question: "Choose the best option for (7):",
+        options: { A: "in case of", B: "In the face of", C: "With regard to", D: "on the other hand" },
+        correct: "B",
+        explanation: "Cụm từ 'In the face of adversity' có nghĩa là 'Khi đối mặt với nghịch cảnh'."
+      },
+      {
+        id: "FQ8",
+        section: "PART B: LEAFLET - Question 8",
+        context: "Despite facing a great (8) ___________ of hardship, he remained focused on his goals and never gave up.",
+        question: "Choose the best option for (8):",
+        options: { A: "level", B: "variety", C: "amount", D: "quantity" },
+        correct: "C",
+        explanation: "'Hardship' là danh từ không đếm được -> dùng cụm 'a great amount of hardship' (rất nhiều gian khổ)."
+      },
+      {
+        id: "FQ9",
+        section: "PART B: LEAFLET - Question 9",
+        context: "His story shows that success comes not only from perseverance but also from the (9) ___________ to learn, adapt, and grow.",
+        question: "Choose the best option for (9):",
+        options: { A: "collaboration", B: "devotion", C: "difficulties", D: "willingness" },
+        correct: "D",
+        explanation: "Cụm 'willingness to do something' nghĩa là sự sẵn lòng/sẵn sàng làm gì."
+      },
+      {
+        id: "FQ10",
+        section: "PART B: LEAFLET - Question 10",
+        context: "Develop resilience: (10) ___________ example of his strength is how he overcame obstacles...",
+        question: "Choose the best option for (10):",
+        options: { A: "Anothers", B: "Another", C: "Other", D: "Others" },
+        correct: "B",
+        explanation: "'Another' đi với danh từ số ít đếm được ('example') mang nghĩa là 'một ví dụ khác'."
+      },
+      {
+        id: "FQ11",
+        section: "PART B: LEAFLET - Question 11",
+        context: "...how he overcame obstacles by (11) ___________ adversity.",
+        question: "Choose the best option for (11):",
+        options: { A: "pushing through", B: "taking part in", C: "giving up on", D: "connecting with" },
+        correct: "A",
+        explanation: "Cụm động từ 'push through adversity' có nghĩa là vượt qua/đẩy lùi nghịch cảnh."
+      },
+      {
+        id: "FQ12",
+        section: "PART B: LEAFLET - Question 12",
+        context: "Let us all hold on to the values President Ho Chi Minh shared and continue to rise above challenges with renewed (12) ___________.",
+        question: "Choose the best option for (12):",
+        options: { A: "full-length", B: "determination", C: "character", D: "perseverance" },
+        correct: "B",
+        explanation: "Cụm từ 'renewed determination' mang nghĩa là 'quyết tâm mới/quyết tâm được tiếp thêm sức mạnh'."
+      },
+
+      // FURTHER PRACTICE ARRANGEMENT
+      {
+        id: "FQ13",
+        section: "PART B: Sentence Arrangement - Question 13",
+        context: "a. John: Hello Anna, yes, his vision and innovation truly revolutionized technology.<br>b. Anna: Hello John, Steve Jobs' life is so inspiring. He turned failure into one of the greatest successes.<br>c. Anna: He proved that thinking differently can change the world.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "a-c-b", B: "b-a-c", C: "b-c-a", D: "c-a-b" },
+        correct: "B",
+        explanation: "Mở đầu Anna chào và nêu nhận xét về Steve Jobs (b) -> John chào lại và đồng ý với nhận định (a) -> Anna kết lại bài học 'thinking differently' (c)."
+      },
+      {
+        id: "FQ14",
+        section: "PART B: Sentence Arrangement - Question 14",
+        context: "a. Anna: Definitely! Despite facing poverty and war, he always valued hard work and family above all.<br>b. Anna: Hi John, I often think about my grandfather. He lived through so many hardships...<br>c. John: His story is truly inspiring. It shows the power of perseverance and love...<br>d. John: Wow, that’s incredible. He must have been a strong and determined man.",
+        question: "Mark the letter A, B, C, or D to indicate the correct arrangement:",
+        options: { A: "b-c-a-d", B: "b-d-a-c", C: "a-c-b-d", D: "c-a-b-d" },
+        correct: "B",
+        explanation: "Anna kể về ông mình (b) -> John khen ngợi sự kiên cường của ông (d) -> Anna xác nhận 'Definitely!' và kể thêm hoàn cảnh gian khổ (a) -> John tổng kết bài học truyền cảm hứng (c)."
+      },
+      {
+        id: "FQ15",
+        section: "PART B: Letter Arrangement - Question 15",
+        context: "Dear John,<br>I hope you're doing well!<br>a. His journey has been marked by countless hours of training...<br>b. Despite facing injuries, criticism, and pressure... Ronaldo's resilience...<br>c. Lately, I've been reflecting on people who inspire me... Cristiano Ronaldo.<br>d. His discipline, work ethic, and constant drive...<br>e. From a young age, Ronaldo showed an unwavering commitment...<br>f. Who do you admire...?<br>g. I would love to hear about the life stories that inspire you.<br>Looking forward to hearing from you!<br>Best regards, David",
+        question: "Choose the correct order:",
+        options: { A: "c-b-e-a-d-g-f", B: "d-g-f-b-e-a-c", C: "d-f-g-c-e-b-a", D: "c-e-a-b-d-g-f" },
+        correct: "D",
+        explanation: "Thứ tự mạch lạc: c (Giới thiệu nhân vật Cristiano Ronaldo) -> e (Từ khi còn trẻ) -> a (Hành trình tập luyện) -> b (Vượt qua chấn thương, áp lực) -> d (Phẩm chất kỷ luật truyền cảm hứng) -> g & f (Hỏi lại đối phương về nhân vật họ ngưỡng mộ)."
+      },
+      {
+        id: "FQ16",
+        section: "PART B: Paragraph Arrangement - Question 16",
+        context: "a. Taylor Swift is a highly successful musician who has worked tirelessly...<br>b. Her ability to evolve as an artist...<br>c. She not only transitioned from country to pop music...<br>d. She has also used her platform to speak out on important social issues...<br>e. Throughout her career, Taylor has won numerous awards, including 12 Grammy Awards...",
+        question: "Choose the correct order:",
+        options: { A: "e-a-c-b-d", B: "e-c-a-b-d", C: "a-c-e-d-b", D: "d-e-a-c-b" },
+        correct: "C",
+        explanation: "Mở đầu a (Giới thiệu Taylor Swift) -> c (Chuyển đổi dòng nhạc) -> e (Thành tựu giải thưởng Grammy) -> d (She has also - các hoạt động xã hội) -> b (Tổng kết sự phát triển và sức ảnh hưởng)."
+      },
+      {
+        id: "FQ17",
+        section: "PART B: Paragraph Arrangement - Question 17",
+        context: "a. His commitment to his craft is evident in his consistent release of hit songs...<br>b. Sơn Tùng M-TP is a shining example of dedication and hard work...<br>c. Over the years, he has faced numerous challenges...<br>d. Additionally, his ability to stay true to himself...<br>e. He not only broke through with his unique musical style...",
+        question: "Choose the correct order:",
+        options: { A: "d – b – a – c – e", B: "e – d – a – b – c", C: "b – c – e – a – d", D: "b – e – c – a – d" },
+        correct: "D",
+        explanation: "Mở đầu b (Giới thiệu Sơn Tùng M-TP) -> e (Đột phá phong cách âm nhạc) -> c (Vượt qua thử thách và chỉ trích) -> a (Minh chứng qua các bản hit) -> d (Additionally - kết luận thành công lâu dài)."
+      },
+
+      // READING 1: MARK ZUCKERBERG
+      {
+        id: "FQ18",
+        section: "PART B: READING - MARK ZUCKERBERG",
+        context: "Mark Zuckerberg, the founder of Facebook, one of the largest social media platforms in the world, (18) ________.",
+        question: "Question 18:",
+        options: {
+          A: "created a global platform that continues to change the way people communicate and connect",
+          B: "that has a profound influence, changing the way people connect and communicate globally",
+          C: "was developed Facebook into a global social network, transforming how billions of people communicate",
+          D: "with Facebook, he created a powerful tool for connection, influencing how people communicate"
+        },
+        correct: "A",
+        explanation: "Chủ ngữ là 'Mark Zuckerberg', bổ ngữ chỉ vị 'the founder of Facebook...' -> Cần một động từ chính dạng chủ động ở thì quá khứ đơn: 'created a global platform...'."
+      },
+      {
+        id: "FQ19",
+        section: "PART B: READING - MARK ZUCKERBERG",
+        context: "Since its launch in 2004, Facebook has transformed the way billions of people connect and communicate. (19) ________.",
+        question: "Question 19:",
+        options: {
+          A: "The platform was created with the main purpose of helping people meet online, and Zuckerberg has allowed everyone to share more information and make friends.",
+          B: "Zuckerberg helped build a platform that allows users to share information, make friends, and join online communities",
+          C: "By sharing information and connecting, Zuckerberg has built a social media platform that helps people meet online.",
+          D: "To share information, make friends, and join communities, Zuckerberg has built a new offline platform for everyone."
+        },
+        correct: "B",
+        explanation: "Phương án B nối tiếp tự nhiên nhất về mặt ngữ pháp và ý nghĩa, giải thích cách nền tảng giúp người dùng chia sẻ thông tin, kết bạn và tham gia cộng đồng."
+      },
+      {
+        id: "FQ20",
+        section: "PART B: READING - MARK ZUCKERBERG",
+        context: "Zuckerberg, (20) ________, expanded Facebook to include other products and services, including Instagram, WhatsApp, and Oculus.",
+        question: "Question 20:",
+        options: {
+          A: "whose innovative ideas have revolutionized social media",
+          B: "with excellent leadership skills and strategic vision",
+          C: "who has excellent leadership skills and a strategic vision",
+          D: "a founder with innovative and groundbreaking thinking"
+        },
+        correct: "A",
+        explanation: "Sử dụng mệnh đề quan hệ sở hữu 'whose innovative ideas...' bổ nghĩa cho danh từ chỉ người 'Zuckerberg'."
+      },
+      {
+        id: "FQ21",
+        section: "PART B: READING - MARK ZUCKERBERG",
+        context: "(21) ________, he created a digital ecosystem that has contributed to the growth of the global tech industry.",
+        question: "Question 21:",
+        options: {
+          A: "Thanks to relationships and collaborations with leading tech companies worldwide",
+          B: "With a deep understanding of technology and the global market",
+          C: "Influenced by the digitalization trend and the development of mobile technology",
+          D: "While developing social media platforms, he created a strong digital ecosystem"
+        },
+        correct: "D",
+        explanation: "Mệnh đề trạng ngữ chỉ thời gian/hành động song song 'While developing social media platforms...' phù hợp nhất về ngữ cảnh thành lập hệ sinh thái số."
+      },
+      {
+        id: "FQ22",
+        section: "PART B: READING - MARK ZUCKERBERG",
+        context: "After Facebook went public in 2012, Zuckerberg continued to lead the company through numerous challenges, achieving significant success. (22) ________.",
+        question: "Question 22:",
+        options: {
+          A: "His life is a testament to perseverance and innovation, making him a major influence in the tech industry",
+          B: "Despite his perseverance and development to innovate in technology, he is known as a great example of great influence",
+          C: "He has become an icon in the technology industry solely due to Facebook's achievements and global influence",
+          D: "Only by maintaining an important role in the technology industry did he become known as an icon thanks to his perseverance and innovation"
+        },
+        correct: "A",
+        explanation: "Phương án A tổng kết đánh giá chuẩn xác nhất về cuộc đời Zuckerberg: 'Cuộc đời ông là minh chứng cho sự kiên trì và đổi mới...'."
+      },
+
+      // READING 2: MALALA YOUSAFZAI
+      {
+        id: "FQ23",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        context: "One of the most inspiring life stories is that of Malala Yousafzai... when faced with danger and adversity. (Paragraph 1)",
+        question: "Question 23: The word 'adversity' in paragraph 1 is OPPOSITE in meaning to ______.",
+        options: { A: "prosperity", B: "difficulty", C: "hope", D: "success" },
+        correct: "A",
+        explanation: "'Adversity' nghĩa là nghịch cảnh/khó khăn. Từ trái nghĩa là 'prosperity' (sự thịnh vượng/thuận lợi)."
+      },
+      {
+        id: "FQ24",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        context: "Paragraph 3: 'Her recovery and bravery inspired millions of people to support her mission.'",
+        question: "Question 24: Which of the following best paraphrases the underlined sentence in paragraph 3?",
+        options: {
+          A: "Malala’s determination after the attack led to global support for her efforts in education.",
+          B: "Malala’s recovery allowed her to continue her fight for education equality.",
+          C: "Malala’s courage motivated millions to join her mission, showing the power of her story.",
+          D: "Malala’s recovery inspired millions of people worldwide to support her cause."
+        },
+        correct: "D",
+        explanation: "Phương án D diễn đạt lại chính xác nhất ý của câu gốc: Sự hồi phục của Malala đã truyền cảm hứng cho hàng triệu người trên thế giới hỗ trợ sứ mệnh của cô."
+      },
+      {
+        id: "FQ25",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        context: "In 2012, Malala faced many risky situations, such as speaking out against the Taliban...",
+        question: "Question 25: The word 'risky' in paragraph 3 could be best replaced by ______.",
+        options: { A: "unpredictable", B: "unusual", C: "adventurous", D: "harmful" },
+        correct: "D",
+        explanation: "'Risky' (nguy hiểm/đầy rủi ro) đồng nghĩa gần nhất với 'harmful' (có thể gây hại/nguy hiểm tới bản thân trong ngữ cảnh này)."
+      },
+      {
+        id: "FQ26",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        question: "Question 26: Which of the following does the passage NOT mention as a benefit of supportive family relationships during adolescence?",
+        options: {
+          A: "Building the child's confidence and resilience",
+          B: "Improving the child's mental health",
+          C: "Increasing the child's desire to perform well academically",
+          D: "Helping the child become more independent"
+        },
+        correct: "C",
+        explanation: "Bài đọc tập trung vào lòng dũng cảm và việc đấu tranh cho giáo dục của Malala, không đề cập đến nội dung về mối quan hệ gia đình giúp tăng mong muốn học giỏi (C)."
+      },
+      {
+        id: "FQ27",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        context: "...speaking out against the Taliban, which led to her being shot. She was just 15 years old.",
+        question: "Question 27: The word 'her' in the passage most likely refers to ______.",
+        options: { A: "girls", B: "Malala Yousafzai", C: "The Taliban", D: "The BBC" },
+        correct: "B",
+        explanation: "Tính từ/đại từ sở hữu 'her' quy chiếu trực tiếp đến nhân vật chính Malala Yousafzai."
+      },
+      {
+        id: "FQ28",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        question: "Question 28: Which of the following is NOT TRUE according to the passage?",
+        options: {
+          A: "Malala faced challenges but continued to speak out for girls' education.",
+          B: "Malala’s story inspired global action for girls’ education.",
+          C: "Malala never faced any opposition or danger in her efforts.",
+          D: "Malala received the Nobel Peace Prize at the age of 17."
+        },
+        correct: "C",
+        explanation: "Phương án C sai vì Malala đã phải đối mặt với nguy hiểm cực lớn và sự chống đối từ Taliban (thậm chí bị bắn vào năm 2012)."
+      },
+      {
+        id: "FQ29",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        question: "Question 29: In which paragraph does the author discuss the lesson from Malala Yousafzai's story?",
+        options: { A: "Paragraph 2", B: "Paragraph 3", C: "Paragraph 4", D: "Paragraph 5" },
+        correct: "D",
+        explanation: "Đoạn 5 đúc kết bài học: 'Malala's life story teaches us that no matter how young or small we are, we can still make a difference...'"
+      },
+      {
+        id: "FQ30",
+        section: "PART B: READING - MALALA YOUSAFZAI",
+        question: "Question 30: In which paragraph does the author mention Malala Yousafzai as a model for courage?",
+        options: { A: "Paragraph 1", B: "Paragraph 2", C: "Paragraph 3", D: "Paragraph 4" },
+        correct: "A",
+        explanation: "Đoạn 1 nêu rõ: '...Malala Yousafzai, a young woman who has become a global symbol of courage and determination.'"
+      },
+
+      // READING 3: JAMES WATT
+      {
+        id: "FQ31",
+        section: "PART B: READING - JAMES WATT",
+        context: "Paragraph 4: [I] He continued to refine and enhance his steam engine... [II] The increased efficiency... [III] This, in turn, helped cities... [IV] Additionally, steam-powered trains...",
+        question: "Question 31: Where in this passage does the sentence 'However, Watt didn't stop there.' best fit?",
+        options: { A: "[I]", B: "[II]", C: "[III]", D: "[IV]" },
+        correct: "A",
+        explanation: "Câu 'However, Watt didn't stop there' đặt ở vị trí [I] để chuyển tiếp hợp lý từ việc được cấp bằng sáng chế ở đoạn 3 sang việc tiếp tục cải tiến động cơ ở đoạn 4."
+      },
+      {
+        id: "FQ32",
+        section: "PART B: READING - JAMES WATT",
+        context: "In 1763, while repairing a model of a steam engine, Watt had a breakthrough.",
+        question: "Question 32: The word 'breakthrough' in paragraph 2 is closest in meaning to:",
+        options: { A: "discovery", B: "motivation", C: "consequence", D: "enhancement" },
+        correct: "A",
+        explanation: "'Breakthrough' có nghĩa là bước đột phá/phát kiến mới, đồng nghĩa với 'discovery' (sự phát hiện/phát minh)."
+      },
+      {
+        id: "FQ33",
+        section: "PART B: READING - JAMES WATT",
+        context: "Despite facing challenges, including poor health and limited resources, he remained determined and curious.",
+        question: "Question 33: The word 'he' in paragraph 2 refers to:",
+        options: { A: "James Watt", B: "Matthew Boulton", C: "businessman", D: "Matthew Boulton, Watt" },
+        correct: "A",
+        explanation: "Đại từ 'he' thay thế cho nhân vật chính James Watt được đề cập ở câu trước."
+      },
+      {
+        id: "FQ34",
+        section: "PART B: READING - JAMES WATT",
+        context: "This breakthrough laid the foundation for his future work.",
+        question: "Question 34: The phrase 'laid the foundation' in paragraph 2 is OPPOSITE in meaning to:",
+        options: { A: "created the basis", B: "set the stage", C: "paved the way", D: "ignored the foundation" },
+        correct: "D",
+        explanation: "'Laid the foundation' nghĩa là đặt nền móng/tạo tiền đề. Trái nghĩa là 'ignored the foundation' (phớt lờ/bỏ qua nền móng)."
+      },
+      {
+        id: "FQ35",
+        section: "PART B: READING - JAMES WATT",
+        question: "Question 35: According to the passage, which is NOT true about James Watt?",
+        options: {
+          A: "He found mechanics interesting when he was young.",
+          B: "There is a unit of power named after him to honour his contributions.",
+          C: "His impact spans across history, the present, and the future.",
+          D: "He had many favourable conditions to nurture his interest in machinery."
+        },
+        correct: "D",
+        explanation: "Phương án D sai vì đoạn 2 ghi rõ Watt gặp nhiều khó khăn bao gồm sức khỏe kém và nguồn lực hạn chế ('poor health and limited resources'), không phải có nhiều điều kiện thuận lợi."
+      },
+      {
+        id: "FQ36",
+        section: "PART B: READING - JAMES WATT",
+        question: "Question 36: Which of the following best summarizes paragraph 3?",
+        options: {
+          A: "James Watt’s steam engine made significant contributions to industrial efficiency and transportation.",
+          B: "James Watt’s invention primarily benefited the textile industry.",
+          C: "Watt’s steam engine was only used for transportation and not in factories.",
+          D: "The steam engine invention was mostly used in mining industries."
+        },
+        correct: "A",
+        explanation: "Đoạn 3 nói về việc động cơ hơi nước của Watt đã cách mạng hóa nhiều ngành công nghiệp (khai khoáng, dệt may) và giao thông vận tải."
+      },
+      {
+        id: "FQ37",
+        section: "PART B: READING - JAMES WATT",
+        question: "Question 37: Which of the following is TRUE according to the passage?",
+        options: {
+          A: "James Watt invented the electric motor and had little impact on industrial machinery.",
+          B: "Watt’s steam engine was only used in the textile manufacturing industry.",
+          C: "Watt continued to improve his steam engine, making it safer, more reliable, and more economical.",
+          D: "Watt’s contributions were mainly in the field of medical technology."
+        },
+        correct: "C",
+        explanation: "Thông tin trong đoạn 4 xác nhận: 'He continued to refine and enhance his steam engine, making it safer, more reliable, and more economical.'"
+      },
+      {
+        id: "FQ38",
+        section: "PART B: READING - JAMES WATT",
+        context: "Beyond these technical achievements, Watt's legacy lives on as a symbol of innovation and ingenuity.",
+        question: "Question 38: Which of the following best paraphrases the underlined part in paragraph 5?",
+        options: {
+          A: "Watt’s ideas were forgotten after his death.",
+          B: "Watt’s achievements are still recognized and inspire future generations.",
+          C: "Watt’s contributions were mainly focused on improving transportation methods.",
+          D: "Watt’s impact is limited to his inventions and did not influence later innovations."
+        },
+        correct: "B",
+        explanation: "Phương án B diễn giải chính xác ý 'legacy lives on' (di sản sống mãi và tiếp tục truyền cảm hứng cho thế hệ tương lai)."
+      },
+      {
+        id: "FQ39",
+        section: "PART B: READING - JAMES WATT",
+        question: "Question 39: Which of the following can be inferred from the passage?",
+        options: {
+          A: "James Watt’s inventions significantly improved the productivity of factories and cities.",
+          B: "The steam engine invention led to the decline of urbanization.",
+          C: "Watt’s steam engine was only effective in rural areas.",
+          D: "Watt's impact on transportation was limited to ships."
+        },
+        correct: "A",
+        explanation: "Có thể suy ra từ đoạn 4: Động cơ hơi nước làm tăng năng suất sản xuất và thúc đẩy sự phát triển đô thị/thành phố."
+      },
+      {
+        id: "FQ40",
+        section: "PART B: READING - JAMES WATT",
+        question: "Question 40: Which of the following best summarizes the passage?",
+        options: {
+          A: "Born in Scotland, James Watt revolutionized the Industrial Revolution by improving the steam engine, which significantly impacted industries, transportation, and urban development.",
+          B: "James Watt focused solely on the invention of the electric motor and had little impact on industrial machinery.",
+          C: "James Watt’s primary contribution was in medical technology, specifically developing devices to aid in treating diseases.",
+          D: "James Watt's inventions were limited to transportation and had no significant influence on industrial production."
+        },
+        correct: "A",
+        explanation: "Phương án A tổng quát đầy đủ và chính xác nhất toàn bộ nội dung bài đọc về thân thế, cải tiến động cơ hơi nước và tầm ảnh hưởng sâu rộng của James Watt."
+      }
+    ];
+
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let studentData = { name: '', email: '' };
+
+    function startQuiz(event) {
+      event.preventDefault();
+      studentData.name = document.getElementById('studentName').value.trim();
+      studentData.email = document.getElementById('studentEmail').value.trim();
+
+      if(!studentData.name || !studentData.email) return;
+
+      document.getElementById('studentInfoCard').classList.add('hidden');
+      document.getElementById('quizApp').classList.remove('hidden');
+      document.getElementById('timerContainer').classList.remove('hidden');
+
+      renderQuestions();
+      startTimer();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        let minutes = Math.floor(secondsElapsed / 60);
+        let seconds = secondsElapsed % 60;
+        document.getElementById('timerDisplay').innerText = 
+          `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      document.getElementById('totalCount').innerText = questionsData.length;
+      container.innerHTML = '';
+
+      questionsData.forEach((item, index) => {
+        const qCard = document.createElement('div');
+        qCard.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-5 md:p-6 transition hover:shadow-md";
+        
+        let html = `
+          <div class="flex items-center justify-between border-b pb-3 mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+              ${item.section}
+            </span>
+            <span class="text-xs font-semibold text-slate-400">Câu ${index + 1}/${questionsData.length}</span>
+          </div>
+        `;
+
+        if(item.context) {
+          html += `<div class="bg-slate-50 border-l-4 border-indigo-500 p-3.5 rounded-r-lg text-slate-700 text-sm mb-4 leading-relaxed font-sans">${item.context}</div>`;
+        }
+
+        html += `<h4 class="font-bold text-slate-800 text-base mb-4">${item.question}</h4>`;
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-3">`;
+
+        Object.keys(item.options).forEach(key => {
+          html += `
+            <label class="flex items-start space-x-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition relative group">
+              <input type="radio" name="${item.id}" value="${key}" onchange="updateProgress()" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+              <span class="text-sm text-slate-700 font-medium"><strong class="text-indigo-600 mr-1">${key}.</strong> ${item.options[key]}</span>
+            </label>
+          `;
+        });
+
+        html += `</div>`;
+        qCard.innerHTML = html;
+        container.appendChild(qCard);
+      });
+    }
+
+    function updateProgress() {
+      const form = document.getElementById('quizForm');
+      const formData = new FormData(form);
+      let answered = 0;
+      for(let pair of formData.entries()) {
+        answered++;
+      }
+      document.getElementById('answeredCount').innerText = answered;
+      const percent = Math.round((answered / questionsData.length) * 100);
+      document.getElementById('percentComplete').innerText = `${percent}%`;
+      document.getElementById('progressBar').style.width = `${percent}%`;
+    }
+
+    function submitQuiz(event) {
+      event.preventDefault();
+      clearInterval(timerInterval);
+
+      const form = document.getElementById('quizForm');
+      const formData = new FormData(form);
+
+      let score = 0;
+      let reviewHtml = '';
+
+      questionsData.forEach((item, index) => {
+        const userAns = formData.get(item.id);
+        const isCorrect = userAns === item.correct;
+
+        if (isCorrect) score++;
+
+        reviewHtml += `
+          <div class="p-5 rounded-xl border ${isCorrect ? 'border-green-200 bg-green-50/40' : 'border-red-200 bg-red-50/40'} space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+              <span class="text-xs font-bold text-slate-500">Câu ${index + 1}: ${item.id}</span>
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> Đúng' : '<i class="fa-solid fa-xmark mr-1"></i> Sai'}
+              </span>
+            </div>
+            <p class="text-sm font-semibold text-slate-800">${item.question}</p>
+            <div class="text-xs space-y-1 bg-white p-3 rounded-lg border border-slate-100">
+              <div class="text-slate-600">Lựa chọn của bạn: <span class="font-bold ${isCorrect ? 'text-green-700' : 'text-red-600'}">${userAns ? userAns + '. ' + item.options[userAns] : 'Chưa chọn đáp án'}</span></div>
+              ${!isCorrect ? `<div class="text-slate-600">Đáp án chính xác: <span class="font-bold text-green-700">${item.correct}. ${item.options[item.correct]}</span></div>` : ''}
+            </div>
+            <!-- Detailed Explanation Box -->
+            <div class="bg-indigo-50/70 border-l-4 border-indigo-500 p-3 rounded-r-lg text-xs text-indigo-950 space-y-1">
+              <div class="font-bold text-indigo-700 flex items-center space-x-1">
+                <i class="fa-solid fa-lightbulb text-yellow-500"></i>
+                <span>Giải thích chi tiết:</span>
+              </div>
+              <p class="leading-relaxed">${item.explanation}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      // Display Result Screen
+      document.getElementById('quizApp').classList.add('hidden');
+      document.getElementById('timerContainer').classList.add('hidden');
+      document.getElementById('resultCard').classList.remove('hidden');
+
+      document.getElementById('resStudentName').innerText = studentData.name;
+      document.getElementById('resStudentEmail').innerText = studentData.email;
+      document.getElementById('resScore').innerText = `${score} / ${questionsData.length}`;
+      
+      const accuracy = Math.round((score / questionsData.length) * 100);
+      document.getElementById('resAccuracy').innerText = `${accuracy}% chính xác`;
+
+      let minutes = Math.floor(secondsElapsed / 60);
+      let seconds = secondsElapsed % 60;
+      document.getElementById('resTime').innerText = `${minutes} phút ${seconds} giây`;
+
+      document.getElementById('reviewContainer').innerHTML = reviewHtml;
+    }
+  </script>
+</body>
+</html>
